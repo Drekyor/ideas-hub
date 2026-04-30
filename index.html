@@ -138,6 +138,14 @@
 
 <body>
 
+<div style="text-align:center; margin-bottom:20px;">
+    <select id="lang" onchange="changeLang()">
+        <option value="it">🇮🇹 Italiano</option>
+        <option value="en">🇬🇧 English</option>
+        <option value="es">🇪🇸 Español</option>
+    </select>
+</div>
+
 <div class="container">
 
     <h1>💡 Dall’idea alla realtà</h1>
@@ -291,6 +299,41 @@ function voteIdea(id) {
         });
     });
 }
+
+const texts = {
+    it: {
+        title: "💡 Dall’idea alla realtà",
+        desc: "Benvenuto su Ideas Hub!",
+        btn: "🚀 Pubblica Idea"
+    },
+    en: {
+        title: "💡 From idea to reality",
+        desc: "Welcome to Ideas Hub!",
+        btn: "🚀 Publish Idea"
+    },
+    es: {
+        title: "💡 De la idea a la realidad",
+        desc: "Bienvenido a Ideas Hub!",
+        btn: "🚀 Publicar idea"
+    }
+};
+
+function changeLang() {
+    const lang = document.getElementById("lang").value;
+
+    document.querySelector("h1").innerText = texts[lang].title;
+    document.querySelectorAll(".description")[0].innerText = texts[lang].desc;
+    document.querySelector("button").innerText = texts[lang].btn;
+
+    localStorage.setItem("lang", lang);
+}
+
+window.onload = () => {
+    const savedLang = localStorage.getItem("lang") || "it";
+    document.getElementById("lang").value = savedLang;
+    changeLang();
+};
+
 </script>
 
 </body>
