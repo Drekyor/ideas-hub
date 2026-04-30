@@ -189,18 +189,28 @@ const db = firebase.firestore();
 let ideas = [];
 
 function saveEmail() {
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("email").value.trim();
 
     if (!email) return;
 
-    db.collection("emails").add({
-        email: email,
-        date: new Date().toLocaleString("it-IT")
-    });
+    db.collection("emails")
+        .where("email", "==", email)
+        .get()
+        .then((querySnapshot) => {
 
-    document.getElementById("email").value = "";
+            if (!querySnapshot.empty) {
+                alert("⚠️ Questa email è già registrata!");
+                return;
+            }
 
-    alert("Email salvata!");
+            db.collection("emails").add({
+                email: email,
+                date: new Date().toLocaleString("it-IT")
+            });
+
+            document.getElementById("email").value = "";
+            alert("✅ Email salvata!");
+        });
 }
 
 db.collection("ideas").onSnapshot((snapshot) => {
