@@ -148,21 +148,21 @@
 
 <div class="container">
 
-    <h1>💡 Dall’idea alla realtà</h1>
+    <h1 data-i18n="title">💡 Dall’idea alla realtà</h1>
 
-    <p class="description">
+    <p class="description" data-i18n="desc1">
     Benvenuto su Ideas Hub!
     </p>
-    <p class="description">
+    <p class="description" data-i18n="desc2">
     Hai un’idea, una necessità o un problema da risolvere? Utilizza questo spazio
     per raccontarlo. La tua proposta potrebbe diventare una vera app, un sito web
     o una piattaforma digitale capace di aiutare migliaia di persone.
     </p>
 
     <div class="form-box">
-        <input type="text" id="title" placeholder="Titolo idea">
-        <textarea id="description" placeholder="Descrivi la tua idea..."></textarea>
-        <button onclick="addIdea()">🚀 Pubblica Idea</button>
+        <input type="text" id="title" data-i18n-placeholder="titlePlaceholder">
+        <textarea id="description" data-i18n-placeholder="descPlaceholder"></textarea>
+        <button onclick="addIdea()" data-i18n="publishBtn">🚀 Pubblica Idea</button>
     </div>
 
     <div class="form-box">
@@ -303,35 +303,53 @@ function voteIdea(id) {
 const texts = {
     it: {
         title: "💡 Dall’idea alla realtà",
-        desc: "Benvenuto su Ideas Hub!",
-        btn: "🚀 Pubblica Idea"
+        desc1: "Benvenuto su Ideas Hub!",
+        desc2: "Condividi la tua idea e trasformala in realtà.",
+        titlePlaceholder: "Titolo idea",
+        descPlaceholder: "Descrivi la tua idea...",
+        publishBtn: "🚀 Pubblica Idea"
     },
     en: {
         title: "💡 From idea to reality",
-        desc: "Welcome to Ideas Hub!",
-        btn: "🚀 Publish Idea"
+        desc1: "Welcome to Ideas Hub!",
+        desc2: "Share your idea and turn it into reality.",
+        titlePlaceholder: "Idea title",
+        descPlaceholder: "Describe your idea...",
+        publishBtn: "🚀 Publish Idea"
     },
     es: {
         title: "💡 De la idea a la realidad",
-        desc: "Bienvenido a Ideas Hub!",
-        btn: "🚀 Publicar idea"
+        desc1: "Bienvenido a Ideas Hub!",
+        desc2: "Comparte tu idea y hazla realidad.",
+        titlePlaceholder: "Título de la idea",
+        descPlaceholder: "Describe tu idea...",
+        publishBtn: "🚀 Publicar idea"
     }
 };
 
-function changeLang() {
-    const lang = document.getElementById("lang").value;
+function applyLanguage(lang) {
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        el.innerText = texts[lang][key];
+    });
 
-    document.querySelector("h1").innerText = texts[lang].title;
-    document.querySelectorAll(".description")[0].innerText = texts[lang].desc;
-    document.querySelector("button").innerText = texts[lang].btn;
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        el.placeholder = texts[lang][key];
+    });
 
     localStorage.setItem("lang", lang);
 }
 
+function changeLang() {
+    const lang = document.getElementById("lang").value;
+    applyLanguage(lang);
+}
+
 window.onload = () => {
-    const savedLang = localStorage.getItem("lang") || "it";
-    document.getElementById("lang").value = savedLang;
-    changeLang();
+    const saved = localStorage.getItem("lang") || "it";
+    document.getElementById("lang").value = saved;
+    applyLanguage(saved);
 };
 
 </script>
