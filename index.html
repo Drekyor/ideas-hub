@@ -267,13 +267,27 @@ function addIdea() {
 }
 
 function voteIdea(id) {
-    const ref = db.collection("ideas").doc(id);
+    const userKey = localStorage.getItem("userKey") || crypto.randomUUID();
+    localStorage.setItem("userKey", userKey);
 
-    ref.get().then((doc) => {
-        const newVotes = doc.data().votes + 1;
+    const voteRef = db.collection("ideas").doc(id);
+    const userVoteRef = db.collection("votes")
+        .doc(id + "_" + userKey);
 
-        ref.update({
-            votes: newVotes
+    userVoteRef.get().then((doc) => {
+        if (doc.exists) {
+            alert("⚠️ Hai già votato questa idea!");
+            return;
+        }
+
+        userVoteRef.set({ voted: true });
+
+        voteRef.get().then((ideaDoc) => {
+            const newVotes = (ideaDoc.data().votes || 0) + 1;
+
+            voteRef.update({
+                votes: newVotes
+            });
         });
     });
 }
