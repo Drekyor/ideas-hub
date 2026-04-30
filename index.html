@@ -157,12 +157,65 @@
         <button onclick="addIdea()">🚀 Pubblica Idea</button>
     </div>
 
+    <div class="form-box">
+        <h3>📩 Rimani aggiornato</h3>
+
+        <input type="email" id="email" placeholder="Inserisci la tua email">
+
+        <button onclick="saveEmail()">💾 Salva email</button>
+    </div>
+
     <div id="ideasList"></div>
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBkmTcMmTRhOJ0PRUvpldplEc7j7KpQ7SE",
+  authDomain: "ideas-hub-57e75.firebaseapp.com",
+  projectId: "ideas-hub-57e75",
+  storageBucket: "ideas-hub-57e75.firebasestorage.app",
+  messagingSenderId: "198474726570",
+  appId: "1:198474726570:web:8323e9b6306c3f3cf9e4d3"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 let ideas = [];
+
+function saveEmail() {
+    const email = document.getElementById("email").value;
+
+    if (!email) return;
+
+    db.collection("emails").add({
+        email: email,
+        date: new Date().toLocaleString("it-IT")
+    });
+
+    document.getElementById("email").value = "";
+
+    alert("Email salvata!");
+}
+
+db.collection("ideas").onSnapshot((snapshot) => {
+    ideas = [];
+
+    snapshot.forEach((doc) => {
+        ideas.push({
+            id: doc.id,
+            ...doc.data()
+        });
+
+    });
+
+    renderIdeas();
+});
 
 function renderIdeas() {
     const ideasList = document.getElementById("ideasList");
@@ -179,7 +232,7 @@ function renderIdeas() {
             <p>${idea.description}</p>
             <small>📅 ${idea.date}</small>
             <p>👍 ${idea.votes} voti</p>
-            <button onclick="voteIdea(${index})">👍 Vota</button>
+            <button onclick="voteIdea('${idea.id}')">👍 Vota</button>
         `;
 
         ideasList.appendChild(box);
@@ -192,29 +245,29 @@ function addIdea() {
 
     if (!title || !description) return;
 
-
     db.collection("ideas").add({
-
-    ideas.push({
         title: title,
         description: description,
         votes: 0,
         date: new Date().toLocaleString("it-IT")
     });
 
-    renderIdeas();
-
     document.getElementById("title").value = "";
     document.getElementById("description").value = "";
 }
 
-function voteIdea(index) {
-    ideas[index].votes++;
-    renderIdeas();
+function voteIdea(id) {
+    const ref = db.collection("ideas").doc(id);
+
+    ref.get().then((doc) => {
+        const newVotes = doc.data().votes + 1;
+
+        ref.update({
+            votes: newVotes
+        });
+    });
 }
 </script>
 
 </body>
 </html>
-</html>
-
