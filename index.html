@@ -161,39 +161,8 @@
 
 </div>
 
-<<<<<<< HEAD
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBkmTcMmTRhOJ0PRUvpldplEc7j7KpQ7SE",
-  authDomain: "ideas-hub-57e75.firebaseapp.com",
-  projectId: "ideas-hub-57e75",
-  storageBucket: "ideas-hub-57e75.firebasestorage.app",
-  messagingSenderId: "198474726570",
-  appId: "1:198474726570:web:8323e9b6306c3f3cf9e4d3"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-db.collection("ideas").onSnapshot((snapshot) => {
-    ideas = [];
-
-    snapshot.forEach((doc) => {
-        ideas.push(doc.data());
-    });
-
-    renderIdeas();
-});
-
-</script>
-
-<script>
-=======
 <script>
 let ideas = [];
->>>>>>> 2bd2a5c1f3ceca85cc3133bbfbdb388343e9f0dd
 
 function renderIdeas() {
     const ideasList = document.getElementById("ideasList");
@@ -223,22 +192,18 @@ function addIdea() {
 
     if (!title || !description) return;
 
-<<<<<<< HEAD
+
     db.collection("ideas").add({
-=======
+
     ideas.push({
->>>>>>> 2bd2a5c1f3ceca85cc3133bbfbdb388343e9f0dd
         title: title,
         description: description,
         votes: 0,
         date: new Date().toLocaleString("it-IT")
     });
 
-<<<<<<< HEAD
-=======
     renderIdeas();
 
->>>>>>> 2bd2a5c1f3ceca85cc3133bbfbdb388343e9f0dd
     document.getElementById("title").value = "";
     document.getElementById("description").value = "";
 }
@@ -250,8 +215,6 @@ function voteIdea(index) {
 </script>
 
 </body>
-<<<<<<< HEAD
 </html>
-=======
 </html>
->>>>>>> 2bd2a5c1f3ceca85cc3133bbfbdb388343e9f0dd
+
