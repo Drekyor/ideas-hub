@@ -196,10 +196,36 @@ const db = firebase.firestore();
 
 let ideas = [];
 
+function isValidEmail(email) {
+    const clean = email.toLowerCase().trim();
+
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(clean)) return false;
+
+    return true;
+}
+
+function isValidText(text) {
+    const clean = text.toLowerCase().trim();
+
+    const vowels = clean.match(/[aeiouàèéìòù]/g);
+    if (!vowels || vowels.length < 3) return false;
+
+    const uniqueChars = new Set(clean.replace(/[^a-zàèéìòù]/g, ""));
+    if (uniqueChars.size < 3) return false;
+
+    return true;
+}
+
 function saveEmail() {
     const email = document.getElementById("email").value.trim().toLowerCase();
 
     if (!email || !email.includes("@")) {
+        alert("Email non valida");
+        return;
+    }
+
+    if (!isValidEmail(email)) {
         alert("Email non valida");
         return;
     }
@@ -282,6 +308,16 @@ function addIdea() {
     if (description.length < 10 || description.length > 500) {
     alert("Descrizione deve avere tra 10 e 500 caratteri");
     return;
+    }
+
+    if (!isValidText(title)) {
+        alert("Titolo non valido o senza senso");
+        return;
+    }
+
+    if (!isValidText(description)) {
+        alert("Descrizione non valida o senza senso");
+        return;
     }
 
     db.collection("ideas").add({
