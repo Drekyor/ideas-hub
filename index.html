@@ -179,6 +179,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
 
@@ -336,8 +337,7 @@ function voteIdea(id) {
     localStorage.setItem("userKey", userKey);
 
     const voteRef = db.collection("ideas").doc(id);
-    const userVoteRef = db.collection("votes")
-        .doc(id + "_" + userKey);
+    const userVoteRef = db.collection("votes").doc(id + "_" + userKey);
 
     userVoteRef.get().then((doc) => {
         if (doc.exists) {
@@ -347,12 +347,8 @@ function voteIdea(id) {
 
         userVoteRef.set({ voted: true });
 
-        voteRef.get().then((ideaDoc) => {
-            const newVotes = (ideaDoc.data().votes || 0) + 1;
-
-            voteRef.update({
-                votes: newVotes
-            });
+        voteRef.update({
+            votes: firebase.firestore.FieldValue.increment(1)
         });
     });
 }
