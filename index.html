@@ -221,8 +221,8 @@ function isValidText(text) {
 function saveEmail() {
     const email = document.getElementById("email").value.trim().toLowerCase();
 
-    if (!email || !email.includes("@")) {
-        alert("Email non valida");
+    if (!email) {
+        alert("Inserisci un'email");
         return;
     }
 
@@ -236,24 +236,22 @@ function saveEmail() {
         return;
     }
 
-    db.collection("emails")
-        .where("email", "==", email)
-        .get()
-        .then((querySnapshot) => {
+    db.collection("emails").doc(email).get().then((doc) => {
 
-            if (!querySnapshot.empty) {
-                alert("⚠️ Questa email è già registrata!");
-                return;
-            }
+        if (doc.exists) {
+            alert("⚠️ Questa email è già registrata!");
+            return;
+        }
 
-            db.collection("emails").add({
-                email: email,
-                date: new Date().toLocaleString("it-IT")
-            });
-
+        db.collection("emails").doc(email).set({
+            email: email,
+            date: new Date().toLocaleString("it-IT")
+        })
+        .then(() => {
             document.getElementById("email").value = "";
             alert("✅ Email salvata!");
         });
+    });
 }
 
 db.collection("ideas").onSnapshot((snapshot) => {
