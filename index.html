@@ -200,8 +200,16 @@ let ideas = [];
 function isValidEmail(email) {
     const clean = email.toLowerCase().trim();
 
+    if (clean.length > 100) return false;
+
+    // email base
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(clean)) return false;
+
+    // evita email palesemente fake tipo a@a.a
+    const parts = clean.split("@");
+    if (parts[0].length < 2) return false;
+    if (parts[1].length < 4) return false;
 
     return true;
 }
@@ -209,11 +217,19 @@ function isValidEmail(email) {
 function isValidText(text) {
     const clean = text.toLowerCase().trim();
 
+    if (clean.length < 5) return false;
+
+    // almeno 3 vocali
     const vowels = clean.match(/[aeiouàèéìòù]/g);
     if (!vowels || vowels.length < 3) return false;
 
-    const uniqueChars = new Set(clean.replace(/[^a-zàèéìòù]/g, ""));
-    if (uniqueChars.size < 3) return false;
+    // almeno 3 lettere diverse
+    const letters = clean.replace(/[^a-zàèéìòù]/g, "");
+    const unique = new Set(letters);
+    if (unique.size < 4) return false;
+
+    // evita stringhe ripetute tipo "aaaaaa"
+    if (/^(.)\1+$/.test(clean)) return false;
 
     return true;
 }
@@ -290,7 +306,19 @@ function renderIdeas() {
     });
 }
 
+let lastPostTime = 0;
+
 function addIdea() {
+    
+    const now = Date.now();
+
+    if (now - lastPostTime < 10000) {
+        alert("⏳ Aspetta qualche secondo prima di pubblicare un'altra idea");
+        return;
+    }
+
+    lastPostTime = now;
+    
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
 
