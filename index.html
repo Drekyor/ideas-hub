@@ -197,9 +197,17 @@ const db = firebase.firestore();
 let ideas = [];
 
 function saveEmail() {
-    const email = document.getElementById("email").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
 
-    if (!email) return;
+    if (!email || !email.includes("@")) {
+        alert("Email non valida");
+        return;
+    }
+
+    if (email.length > 100) {
+        alert("Email troppo lunga");
+        return;
+    }
 
     db.collection("emails")
         .where("email", "==", email)
