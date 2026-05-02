@@ -261,7 +261,20 @@ function addIdea() {
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
 
-    if (!title || !description) return;
+    if (!title || !description) {
+    alert("Compila tutti i campi");
+    return;
+    }
+
+    if (title.length < 3 || title.length > 50) {
+    alert("Titolo deve avere tra 3 e 50 caratteri");
+    return;
+    }
+
+    if (description.length < 10 || description.length > 500) {
+    alert("Descrizione deve avere tra 10 e 500 caratteri");
+    return;
+    }
 
     db.collection("ideas").add({
         title: title,
