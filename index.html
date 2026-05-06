@@ -55,7 +55,7 @@
         margin-bottom: 30px;
     }
 
-    input, textarea {
+    input, textarea, select {
         width: 100%;
         padding: 12px;
         margin-top: 10px;
@@ -162,6 +162,15 @@
     <div class="form-box">
         <input type="text" id="title" data-i18n-placeholder="titlePlaceholder">
         <textarea id="description" data-i18n-placeholder="descPlaceholder"></textarea>
+
+        <select id="category">
+            <option value="">-- Seleziona categoria --</option>
+            <option value="idea">💡 Idea</option>
+            <option value="software">💻 Software</option>
+            <option value="web">🌐 Pagina Web</option>
+            <option value="other">❌ Altro</option>
+        </select>
+
         <button onclick="addIdea()" data-i18n="publishBtn">🚀 Pubblica Idea</button>
     </div>
 
@@ -297,7 +306,7 @@ function renderIdeas() {
         box.innerHTML = `
             <h3>${idea.title}</h3>
             <p>${idea.description}</p>
-            <small>📅 ${idea.date}</small>
+            <small>📌 ${idea.category}</small>
             <p>👍 ${idea.votes} voti</p>
             <button onclick="voteIdea('${idea.id}')">👍 Vota</button>
         `;
@@ -321,10 +330,16 @@ function addIdea() {
     
     const title = document.getElementById("title").value;
     const description = document.getElementById("description").value;
+    const category = document.getElementById("category").value;
 
-    if (!title || !description) {
-    alert("Compila tutti i campi");
-    return;
+    if (!title || !description || !category) {
+        alert("Compila tutti i campi");
+        return;
+    }
+
+    if (category === "other") {
+        alert("⚠️ Al momento sono accettate solo Idee, Software e Pagine Web");
+        return;
     }
 
     if (title.length < 3 || title.length > 50) {
@@ -350,6 +365,7 @@ function addIdea() {
     db.collection("ideas").add({
         title: title,
         description: description,
+        category: category,
         votes: 0,
         date: new Date().toLocaleString("it-IT")
     });
