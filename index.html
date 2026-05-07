@@ -1,74 +1,74 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ideas Hub</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ideas Hub</title>
 
-<style>
-    body {
+    <style>
+      body {
         line-height: 1.6;
         letter-spacing: 0.2px;
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 20px;
 
-        background-image: linear-gradient(
-        rgba(0,0,0,0.6),
-        rgba(0,0,0,0.6)
-        ),
-        url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d");
+        background-image:
+          linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+          url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d");
 
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
 
         color: #e5e7eb;
-    }
+      }
 
-    .container {
+      .container {
         max-width: 800px;
         margin: auto;
         padding: 40px 20px;
-    }
+      }
 
-    h1 {
+      h1 {
         text-align: center;
         font-size: 36px;
         margin-bottom: 10px;
-    }
+      }
 
-    .description {
+      .description {
         text-align: center;
         color: #cbd5e1;
         margin-bottom: 30px;
         font-size: 16px;
         line-height: 1.5;
-    }
+      }
 
-    .form-box {
-        background: rgba(255,255,255,0.05);
+      .form-box {
+        background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(10px);
         padding: 20px;
         border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 30px;
-    }
+      }
 
-    input, textarea, select {
+      input,
+      textarea,
+      select {
         width: 100%;
         padding: 12px;
         margin-top: 10px;
         margin-bottom: 15px;
         border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.1);
-        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
         color: #ffffff;
         outline: none;
         box-sizing: border-box;
-    }
+      }
 
-    button {
+      button {
         width: 100%;
         padding: 12px;
         background: #6366f1;
@@ -78,378 +78,506 @@
         border-radius: 10px;
         cursor: pointer;
         transition: 0.2s;
-    }
+      }
 
-    button:hover {
+      button:hover {
         background: #4f46e5;
-    }
+      }
 
-    .idea {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
+      .idea {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 15px;
         border-radius: 14px;
         margin-bottom: 12px;
 
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
 
-    .animate-card {
-    animation: fadeInUp 0.4s ease;
-    }
+      .animate-card {
+        animation: fadeInUp 0.4s ease;
+      }
 
-    @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    }
-    
-    .idea:hover {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .idea:hover {
         transform: translateY(-6px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-    }
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      }
 
-    .idea h3 {
+      .idea h3 {
         margin: 0;
         font-size: 18px;
         color: #fff;
-    }
+      }
 
-    .idea p {
+      .idea p {
         color: #cbd5e1;
         margin-top: 6px;
         font-size: 14px;
-    }
+      }
 
-    small {
+      small {
         display: block;
         color: #94a3b8;
         margin-bottom: 10px;
         font-size: 12px;
-}
-</style>
-</head>
+      }
 
-<body>
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
 
-<div style="text-align:center; margin-bottom:20px;">
-    <select id="lang" onchange="changeLang()">
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        cursor: pointer;
+      }
+
+      select option {
+        background: #1e293b;
+        color: white;
+      }
+
+      #ideasList {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+      .idea-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .idea-description.expanded {
+        display: block;
+      }
+
+      .idea {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .idea::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.03),
+          transparent
+        );
+        transform: translateX(-100%);
+        transition: 0.6s;
+      }
+
+      .idea:hover::before {
+        transform: translateX(100%);
+      }
+
+      .badge {
+        background: rgba(99, 102, 241, 0.2);
+        color: #a5b4fc;
+        padding: 4px 10px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-bottom: 8px;
+        font-size: 12px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="text-align: center; margin-bottom: 20px">
+      <select id="lang" onchange="changeLang()">
         <option value="it">🇮🇹 Italiano</option>
         <option value="en">🇬🇧 English</option>
         <option value="es">🇪🇸 Español</option>
-    </select>
-</div>
+      </select>
+    </div>
 
-<div class="container">
+    <div class="container">
+      <h1 data-i18n="title">💡 Dall’idea alla realtà</h1>
 
-    <h1 data-i18n="title">💡 Dall’idea alla realtà</h1>
+      <p class="description" data-i18n="desc1">Benvenuto su Ideas Hub!</p>
+      <p class="description" data-i18n="desc2">
+        Hai un’idea, una necessità o un problema da risolvere? Utilizza questo
+        spazio per raccontarlo. La tua proposta potrebbe diventare una vera app,
+        un sito web o una piattaforma digitale capace di aiutare migliaia di
+        persone.
+      </p>
 
-    <p class="description" data-i18n="desc1">
-    Benvenuto su Ideas Hub!
-    </p>
-    <p class="description" data-i18n="desc2">
-    Hai un’idea, una necessità o un problema da risolvere? Utilizza questo spazio
-    per raccontarlo. La tua proposta potrebbe diventare una vera app, un sito web
-    o una piattaforma digitale capace di aiutare migliaia di persone.
-    </p>
-
-    <div class="form-box">
-        <input type="text" id="title" data-i18n-placeholder="titlePlaceholder">
-        <textarea id="description" data-i18n-placeholder="descPlaceholder"></textarea>
+      <div class="form-box">
+        <input
+          type="text"
+          id="title"
+          data-i18n-placeholder="titlePlaceholder"
+        />
+        <textarea
+          id="description"
+          data-i18n-placeholder="descPlaceholder"
+        ></textarea>
 
         <select id="category">
-            <option value="">-- Seleziona categoria --</option>
-            <option value="idea">💡 Idea</option>
-            <option value="software">💻 Software</option>
-            <option value="web">🌐 Pagina Web</option>
-            <option value="other">❌ Altro</option>
+          <option value="">-- Seleziona categoria --</option>
+          <option value="app">📱 App</option>
+          <option value="software">💻 Software</option>
+          <option value="web">🌐 Pagina Web</option>
+          <option value="other">❌ Altro</option>
         </select>
 
-        <button onclick="addIdea()" data-i18n="publishBtn">🚀 Pubblica Idea</button>
-    </div>
+        <button onclick="addIdea()" data-i18n="publishBtn">
+          🚀 Pubblica Idea
+        </button>
+      </div>
 
-    <div class="form-box">
+      <div class="form-box">
         <h3>📩 Rimani aggiornato</h3>
 
-        <input type="email" id="email" placeholder="Inserisci la tua email">
+        <input type="email" id="email" placeholder="Inserisci la tua email" />
 
         <button onclick="saveEmail()">💾 Salva email</button>
+      </div>
+
+      <div id="ideasList"></div>
     </div>
 
-    <div id="ideasList"></div>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-</div>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBkmTcMmTRhOJ0PRUvpldplEc7j7KpQ7SE",
+        authDomain: "ideas-hub-57e75.firebaseapp.com",
+        projectId: "ideas-hub-57e75",
+        storageBucket: "ideas-hub-57e75.firebasestorage.app",
+        messagingSenderId: "198474726570",
+        appId: "1:198474726570:web:8323e9b6306c3f3cf9e4d3",
+      };
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-<script>
+      let ideas = [];
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBkmTcMmTRhOJ0PRUvpldplEc7j7KpQ7SE",
-  authDomain: "ideas-hub-57e75.firebaseapp.com",
-  projectId: "ideas-hub-57e75",
-  storageBucket: "ideas-hub-57e75.firebasestorage.app",
-  messagingSenderId: "198474726570",
-  appId: "1:198474726570:web:8323e9b6306c3f3cf9e4d3"
-};
+      function isValidEmail(email) {
+        const clean = email.toLowerCase().trim();
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+        if (clean.length > 100) return false;
 
-let ideas = [];
+        // email base
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!regex.test(clean)) return false;
 
-function isValidEmail(email) {
-    const clean = email.toLowerCase().trim();
+        // evita email palesemente fake tipo a@a.a
+        const parts = clean.split("@");
+        if (parts[0].length < 2) return false;
+        if (parts[1].length < 4) return false;
 
-    if (clean.length > 100) return false;
+        return true;
+      }
 
-    // email base
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(clean)) return false;
+      function isValidText(text) {
+        const clean = text.toLowerCase().trim();
 
-    // evita email palesemente fake tipo a@a.a
-    const parts = clean.split("@");
-    if (parts[0].length < 2) return false;
-    if (parts[1].length < 4) return false;
+        if (clean.length < 5) return false;
 
-    return true;
-}
+        // almeno 3 vocali
+        const vowels = clean.match(/[aeiouàèéìòù]/g);
+        if (!vowels || vowels.length < 3) return false;
 
-function isValidText(text) {
-    const clean = text.toLowerCase().trim();
+        // almeno 3 lettere diverse
+        const letters = clean.replace(/[^a-zàèéìòù]/g, "");
+        const unique = new Set(letters);
+        if (unique.size < 4) return false;
 
-    if (clean.length < 5) return false;
+        // evita stringhe ripetute tipo "aaaaaa"
+        if (/^(.)\1+$/.test(clean)) return false;
 
-    // almeno 3 vocali
-    const vowels = clean.match(/[aeiouàèéìòù]/g);
-    if (!vowels || vowels.length < 3) return false;
+        return true;
+      }
 
-    // almeno 3 lettere diverse
-    const letters = clean.replace(/[^a-zàèéìòù]/g, "");
-    const unique = new Set(letters);
-    if (unique.size < 4) return false;
+      function saveEmail() {
+        const email = document
+          .getElementById("email")
+          .value.trim()
+          .toLowerCase();
 
-    // evita stringhe ripetute tipo "aaaaaa"
-    if (/^(.)\1+$/.test(clean)) return false;
-
-    return true;
-}
-
-function saveEmail() {
-    const email = document.getElementById("email").value.trim().toLowerCase();
-
-    if (!email) {
-        alert("Inserisci un'email");
-        return;
-    }
-
-    if (!isValidEmail(email)) {
-        alert("Email non valida");
-        return;
-    }
-
-    if (email.length > 100) {
-        alert("Email troppo lunga");
-        return;
-    }
-
-    db.collection("emails").doc(email).get().then((doc) => {
-
-        if (doc.exists) {
-            alert("⚠️ Questa email è già registrata!");
-            return;
+        if (!email) {
+          alert("Inserisci un'email");
+          return;
         }
 
-        db.collection("emails").doc(email).set({
-            email: email,
-            date: new Date().toLocaleString("it-IT")
-        })
-        .then(() => {
-            document.getElementById("email").value = "";
-            alert("✅ Email salvata!");
-        });
-    });
-}
+        if (!isValidEmail(email)) {
+          alert("Email non valida");
+          return;
+        }
 
-db.collection("ideas").onSnapshot((snapshot) => {
-    ideas = [];
+        if (email.length > 100) {
+          alert("Email troppo lunga");
+          return;
+        }
 
-    snapshot.forEach((doc) => {
-        ideas.push({
+        db.collection("emails")
+          .doc(email)
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              alert("⚠️ Questa email è già registrata!");
+              return;
+            }
+
+            db.collection("emails")
+              .doc(email)
+              .set({
+                email: email,
+                date: new Date().toLocaleString("it-IT"),
+              })
+              .then(() => {
+                document.getElementById("email").value = "";
+                alert("✅ Email salvata!");
+              });
+          });
+      }
+
+      db.collection("ideas").onSnapshot((snapshot) => {
+        ideas = [];
+
+        snapshot.forEach((doc) => {
+          ideas.push({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
+          });
         });
 
-    });
+        renderIdeas();
+      });
 
-    renderIdeas();
-});
+      function renderIdeas() {
+        const ideasList = document.getElementById("ideasList");
+        ideasList.innerHTML = "";
 
-function renderIdeas() {
-    const ideasList = document.getElementById("ideasList");
-    ideasList.innerHTML = "";
+        ideas.sort((a, b) => b.votes - a.votes);
 
-    ideas.sort((a, b) => b.votes - a.votes);
+        ideas.forEach((idea, index) => {
+          const box = document.createElement("div");
+          box.className = "idea animate-card";
 
-    ideas.forEach((idea, index) => {
-        const box = document.createElement("div");
-        box.className = "idea animate-card";
-
-        box.innerHTML = `
+          box.innerHTML = `
             <h3>${idea.title}</h3>
-            <p>${idea.description}</p>
+            <small class="badge">${idea.category}</small>
+            <p id="desc-${idea.id}" class="idea-description">
+                ${idea.description}
+            </p>
+
+            <small onclick="toggleDescription('${idea.id}')" 
+            style="cursor:pointer; color:#818cf8;">
+                Continua a leggere
+            </small>
+
             <small>📌 ${idea.category}</small>
-            <p>👍 ${idea.votes} voti</p>
-            <button onclick="voteIdea('${idea.id}')">👍 Vota</button>
-        `;
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button onclick="likeIdea('${idea.id}')">👍</button>
+                <button onclick="dislikeIdea('${idea.id}')">👎</button>
+                <button onclick="commentIdea('${idea.id}')">💬</button>
+            </div>
+            `;
 
-        ideasList.appendChild(box);
-    });
-}
+          ideasList.appendChild(box);
+        });
+      }
 
-let lastPostTime = 0;
+      let lastPostTime = 0;
 
-function addIdea() {
-    
-    const now = Date.now();
+      function addIdea() {
+        const now = Date.now();
 
-    if (now - lastPostTime < 10000) {
-        alert("⏳ Aspetta qualche secondo prima di pubblicare un'altra idea");
-        return;
-    }
+        if (now - lastPostTime < 10000) {
+          alert("⏳ Aspetta qualche secondo prima di pubblicare un'altra idea");
+          return;
+        }
 
-    lastPostTime = now;
-    
-    const title = document.getElementById("title").value;
-    const description = document.getElementById("description").value;
-    const category = document.getElementById("category").value;
+        lastPostTime = now;
 
-    if (!title || !description || !category) {
-        alert("Compila tutti i campi");
-        return;
-    }
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        const category = document.getElementById("category").value;
 
-    if (category === "other") {
-        alert("⚠️ Al momento sono accettate solo Idee, Software e Pagine Web");
-        return;
-    }
+        if (!title || !description || !category) {
+          alert("Compila tutti i campi");
+          return;
+        }
 
-    if (title.length < 3 || title.length > 50) {
-    alert("Titolo deve avere tra 3 e 50 caratteri");
-    return;
-    }
+        if (category === "other") {
+          alert("⚠️ Al momento sono accettate solo App, Software e Pagine Web");
+          return;
+        }
 
-    if (description.length < 10 || description.length > 500) {
-    alert("Descrizione deve avere tra 10 e 500 caratteri");
-    return;
-    }
+        if (title.length < 3 || title.length > 50) {
+          alert("Titolo deve avere tra 3 e 50 caratteri");
+          return;
+        }
 
-    if (!isValidText(title)) {
-        alert("Titolo non valido o senza senso");
-        return;
-    }
+        if (description.length < 10 || description.length > 500) {
+          alert("Descrizione deve avere tra 10 e 500 caratteri");
+          return;
+        }
 
-    if (!isValidText(description)) {
-        alert("Descrizione non valida o senza senso");
-        return;
-    }
+        if (!isValidText(title)) {
+          alert("Titolo non valido o senza senso");
+          return;
+        }
 
-    db.collection("ideas").add({
-        title: title,
-        description: description,
-        category: category,
-        votes: 0,
-        date: new Date().toLocaleString("it-IT")
-    });
+        if (!isValidText(description)) {
+          alert("Descrizione non valida o senza senso");
+          return;
+        }
 
-    document.getElementById("title").value = "";
-    document.getElementById("description").value = "";
-}
+        db.collection("ideas").add({
+          title: title,
+          description: description,
+          category: category,
+          votes: 0,
+          date: new Date().toLocaleString("it-IT"),
+        });
 
-function voteIdea(id) {
-    const userKey = localStorage.getItem("userKey") || crypto.randomUUID();
-    localStorage.setItem("userKey", userKey);
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+      }
 
-    const voteRef = db.collection("ideas").doc(id);
-    const userVoteRef = db.collection("votes").doc(id + "_" + userKey);
+      function voteIdea(id) {
+        const userKey = localStorage.getItem("userKey") || crypto.randomUUID();
+        localStorage.setItem("userKey", userKey);
 
-    userVoteRef.get().then((doc) => {
-        if (doc.exists) {
+        const voteRef = db.collection("ideas").doc(id);
+        const userVoteRef = db.collection("votes").doc(id + "_" + userKey);
+
+        userVoteRef.get().then((doc) => {
+          if (doc.exists) {
             alert("⚠️ Hai già votato questa idea!");
             return;
-        }
+          }
 
-        userVoteRef.set({ voted: true });
+          userVoteRef.set({ voted: true });
 
-        voteRef.update({
-            votes: firebase.firestore.FieldValue.increment(1)
+          voteRef.update({
+            votes: firebase.firestore.FieldValue.increment(1),
+          });
         });
-    });
-}
+      }
 
-const texts = {
-    it: {
-        title: "💡 Dall’idea alla realtà",
-        desc1: "Benvenuto su Ideas Hub!",
-        desc2: "Hai un’idea, una necessità o un problema da risolvere? Utilizza questo spazio per raccontarlo. La tua proposta potrebbe diventare una vera app, un sito web o una piattaforma digitale capace di aiutare migliaia di persone.",
-        titlePlaceholder: "Titolo idea",
-        descPlaceholder: "Descrivi la tua idea...",
-        publishBtn: "🚀 Pubblica Idea"
-    },
+      const texts = {
+        it: {
+          title: "💡 Dall’idea alla realtà",
+          desc1: "Benvenuto su Ideas Hub!",
+          desc2:
+            "Hai un’idea, una necessità o un problema da risolvere? Utilizza questo spazio per raccontarlo. La tua proposta potrebbe diventare una vera app, un sito web o una piattaforma digitale capace di aiutare migliaia di persone.",
+          titlePlaceholder: "Titolo idea",
+          descPlaceholder: "Descrivi la tua idea...",
+          publishBtn: "🚀 Pubblica Idea",
+        },
 
-    en: {
-        title: "💡 From idea to reality",
-        desc1: "Welcome to Ideas Hub!",
-        desc2: "Do you have an idea, a need or a problem to solve? Use this space to describe it. Your proposal could become a real app, website or digital platform that helps thousands of people.",
-        titlePlaceholder: "Idea title",
-        descPlaceholder: "Describe your idea...",
-        publishBtn: "🚀 Publish Idea"
-    },
+        en: {
+          title: "💡 From idea to reality",
+          desc1: "Welcome to Ideas Hub!",
+          desc2:
+            "Do you have an idea, a need or a problem to solve? Use this space to describe it. Your proposal could become a real app, website or digital platform that helps thousands of people.",
+          titlePlaceholder: "Idea title",
+          descPlaceholder: "Describe your idea...",
+          publishBtn: "🚀 Publish Idea",
+        },
 
-    es: {
-        title: "💡 De la idea a la realidad",
-        desc1: "Bienvenido a Ideas Hub!",
-        desc2: "¿Tienes una idea, una necesidad o un problema que resolver? Usa este espacio para describirlo. Tu propuesta podría convertirse en una app, sitio web o plataforma digital que ayude a miles de personas.",
-        titlePlaceholder: "Título de la idea",
-        descPlaceholder: "Describe tu idea...",
-        publishBtn: "🚀 Publicar idea"
-    }
-};
+        es: {
+          title: "💡 De la idea a la realidad",
+          desc1: "Bienvenido a Ideas Hub!",
+          desc2:
+            "¿Tienes una idea, una necesidad o un problema que resolver? Usa este espacio para describirlo. Tu propuesta podría convertirse en una app, sitio web o plataforma digital que ayude a miles de personas.",
+          titlePlaceholder: "Título de la idea",
+          descPlaceholder: "Describe tu idea...",
+          publishBtn: "🚀 Publicar idea",
+        },
+      };
 
-function applyLanguage(lang) {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        el.innerText = texts[lang][key];
-    });
+      function applyLanguage(lang) {
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          el.innerText = texts[lang][key];
+        });
 
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-        const key = el.getAttribute("data-i18n-placeholder");
-        el.placeholder = texts[lang][key];
-    });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          const key = el.getAttribute("data-i18n-placeholder");
+          el.placeholder = texts[lang][key];
+        });
 
-    localStorage.setItem("lang", lang);
-}
+        localStorage.setItem("lang", lang);
+      }
 
-function changeLang() {
-    const lang = document.getElementById("lang").value;
-    applyLanguage(lang);
-}
+      function changeLang() {
+        const lang = document.getElementById("lang").value;
+        applyLanguage(lang);
+      }
 
-window.onload = () => {
-    const saved = localStorage.getItem("lang") || "it";
-    document.getElementById("lang").value = saved;
-    applyLanguage(saved);
-};
+      window.onload = () => {
+        const saved = localStorage.getItem("lang") || "it";
+        document.getElementById("lang").value = saved;
+        applyLanguage(saved);
+      };
 
-</script>
+      function toggleDescription(id) {
+        const desc = document.getElementById("desc-" + id);
+        desc.classList.toggle("expanded");
+      }
 
-</body>
+      function likeIdea(id) {
+        db.collection("ideas")
+          .doc(id)
+          .update({
+            likes: firebase.firestore.FieldValue.increment(1),
+          });
+      }
+
+      function dislikeIdea(id) {
+        db.collection("ideas")
+          .doc(id)
+          .update({
+            dislikes: firebase.firestore.FieldValue.increment(1),
+          });
+      }
+
+      function commentIdea(id) {
+        const text = prompt("Scrivi un commento:");
+
+        if (!text) return;
+
+        db.collection("ideas")
+          .doc(id)
+          .collection("comments")
+          .add({
+            text: text,
+            date: new Date().toLocaleString("it-IT"),
+          });
+      }
+    </script>
+  </body>
 </html>
