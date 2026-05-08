@@ -711,22 +711,38 @@
       }
 
       const auth = firebase.auth();
-
       let currentUser = null;
 
+      // recupera utente dopo redirect Google
+      auth
+        .getRedirectResult()
+        .then((result) => {
+          if (result.user) {
+            currentUser = result.user;
+            console.log("Redirect login:", result.user.uid);
+          }
+        })
+        .catch((error) => {
+          console.error("Redirect error:", error);
+        });
+
+      // controlla sessione già esistente
       auth.onAuthStateChanged((user) => {
         if (user) {
           currentUser = user;
           console.log("Login:", user.uid);
-        } else {
-          const provider = new firebase.auth.GoogleAuthProvider();
-          auth.signInWithRedirect(provider);
         }
       });
 
+      // login manuale solo quando serve
+      function login() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithRedirect(provider);
+      }
+
       function requireUser() {
         if (!currentUser) {
-          alert("Devi effettuare il login");
+          login();
           return false;
         }
         return true;
