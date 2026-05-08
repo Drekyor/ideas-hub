@@ -420,7 +420,7 @@
       let lastPostTime = 0;
 
       function addIdea() {
-        if (!requireUser()) return;
+        if (!requireUser(addIdea)) return;
         const now = Date.now();
 
         if (now - lastPostTime < 10000) {
@@ -736,9 +736,11 @@
           currentUser = user;
           console.log("Login:", user.uid);
 
+          // 🔥 SE C'ERA UN'AZIONE IN SOSPESO, ESEGUILA
           if (window.pendingAction) {
-            window.pendingAction();
+            const action = window.pendingAction;
             window.pendingAction = null;
+            action();
           }
         }
       });
@@ -750,17 +752,16 @@
       }
 
       function requireUser(callback) {
-        const user = firebase.auth().currentUser;
-
-        if (!user) {
-          login();
-
-          // salva azione da fare dopo login
-          window.pendingAction = callback;
-          return false;
+        if (currentUser) {
+          return true;
         }
 
-        return true;
+        login();
+
+        // salva azione da rifare dopo login
+        window.pendingAction = callback;
+
+        return false;
       }
     </script>
   </body>
