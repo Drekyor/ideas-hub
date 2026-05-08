@@ -378,7 +378,7 @@
         const ideasList = document.getElementById("ideasList");
         ideasList.innerHTML = "";
 
-        ideas.sort((a, b) => b.votes - a.votes);
+        ideas.sort((a, b) => (b.likes || 0) - (a.likes || 0));
 
         ideas.forEach((idea, index) => {
           const box = document.createElement("div");
@@ -391,7 +391,7 @@
                 ${idea.description}
             </p>
 
-            <small onclick="toggleDescription('${idea.id}')" 
+            <small onclick="toggleDescription('${idea.id}', this)" 
             style="cursor:pointer; color:#818cf8;">
                 Continua a leggere
             </small>
@@ -402,6 +402,12 @@
                 <button onclick="dislikeIdea('${idea.id}')">👎</button>
                 <button onclick="commentIdea('${idea.id}')">💬</button>
             </div>
+
+            <button onclick="analyzeIdea('${idea.id}', \`${idea.title} ${idea.description}\`)">
+                🧠 Analizza idea
+            </button>
+
+            <p id="ai-result-${idea.id}" style="color:#a5b4fc; margin-top:6px;"></p>
             `;
 
           ideasList.appendChild(box);
@@ -459,34 +465,15 @@
           description: description,
           category: category,
           votes: 0,
+          likes: 0,
+          dislikes: 0,
           date: new Date().toLocaleString("it-IT"),
         });
 
         document.getElementById("title").value = "";
         document.getElementById("description").value = "";
       }
-
-      function voteIdea(id) {
-        const userKey = localStorage.getItem("userKey") || crypto.randomUUID();
-        localStorage.setItem("userKey", userKey);
-
-        const voteRef = db.collection("ideas").doc(id);
-        const userVoteRef = db.collection("votes").doc(id + "_" + userKey);
-
-        userVoteRef.get().then((doc) => {
-          if (doc.exists) {
-            alert("⚠️ Hai già votato questa idea!");
-            return;
-          }
-
-          userVoteRef.set({ voted: true });
-
-          voteRef.update({
-            votes: firebase.firestore.FieldValue.increment(1),
-          });
-        });
-      }
-
+      
       const texts = {
         it: {
           title: "💡 Dall’idea alla realtà",
@@ -544,39 +531,204 @@
         applyLanguage(saved);
       };
 
-      function toggleDescription(id) {
+      function toggleDescription(id, el) {
         const desc = document.getElementById("desc-" + id);
+
         desc.classList.toggle("expanded");
+
+        el.innerText = desc.classList.contains("expanded")
+          ? "Riduci"
+          : "Continua a leggere";
       }
 
       function likeIdea(id) {
-        db.collection("ideas")
+        if (!requireUser()) return;
+
+        const ref = db
+          .collection("ideas")
           .doc(id)
-          .update({
+          .collection("reactions")
+          .doc(currentUser.uid);
+
+        const ideaRef = db.collection("ideas").doc(id);
+
+        ref.get().then((doc) => {
+          const prev = doc.exists ? doc.data().type : null;
+
+          if (prev === "like") {
+            alert("⚠️ Hai già messo like!");
+            return;
+          }
+
+          const batch = db.batch();
+
+          // se prima era dislike → correggi contatore
+          if (prev === "dislike") {
+            batch.update(ideaRef, {
+              dislikes: firebase.firestore.FieldValue.increment(-1),
+            });
+          }
+
+          batch.set(ref, { type: "like" });
+
+          batch.update(ideaRef, {
             likes: firebase.firestore.FieldValue.increment(1),
           });
-      }
 
+          batch.commit();
+        });
+      }
       function dislikeIdea(id) {
-        db.collection("ideas")
+        if (!requireUser()) return;
+
+        const ref = db
+          .collection("ideas")
           .doc(id)
-          .update({
+          .collection("reactions")
+          .doc(currentUser.uid);
+
+        const ideaRef = db.collection("ideas").doc(id);
+
+        ref.get().then((doc) => {
+          const prev = doc.exists ? doc.data().type : null;
+
+          if (prev === "dislike") {
+            alert("⚠️ Hai già messo dislike!");
+            return;
+          }
+
+          const batch = db.batch();
+
+          if (prev === "like") {
+            batch.update(ideaRef, {
+              likes: firebase.firestore.FieldValue.increment(-1),
+            });
+          }
+
+          batch.set(ref, { type: "dislike" });
+
+          batch.update(ideaRef, {
             dislikes: firebase.firestore.FieldValue.increment(1),
           });
+
+          batch.commit();
+        });
       }
 
       function commentIdea(id) {
+        if (!requireUser()) return;
+
         const text = prompt("Scrivi un commento:");
 
-        if (!text) return;
+        if (!text || text.trim().length < 2) return;
 
         db.collection("ideas")
           .doc(id)
           .collection("comments")
           .add({
             text: text,
+            userId: currentUser.uid,
+            userName: currentUser.displayName,
             date: new Date().toLocaleString("it-IT"),
           });
+      }
+
+      function analyzeIdea(id, text) {
+        const t = text.toLowerCase();
+
+        let score = 0;
+        let feedback = "";
+
+        // 📏 lunghezza più intelligente
+        if (t.length > 250) score += 3;
+        else if (t.length > 120) score += 2;
+        else score += 1;
+
+        // 💡 keyword positive
+        const strongKeywords = [
+          "app",
+          "software",
+          "web",
+          "piattaforma",
+          "ai",
+          "intelligenza",
+          "automazione",
+          "startup",
+          "innovazione",
+          "problema",
+          "soluzione",
+        ];
+
+        strongKeywords.forEach((word) => {
+          if (t.includes(word)) score += 1;
+        });
+
+        // 🧠 qualità logica (bonus se idea “concreta”)
+        if (
+          t.includes("per") ||
+          t.includes("aiuta") ||
+          t.includes("permette")
+        ) {
+          score += 1;
+        }
+
+        // 🌍 lingua dal sito
+        const lang = localStorage.getItem("lang") || "it";
+
+        // 🧠 valutazione finale più precisa
+        if (score <= 3) {
+          feedback =
+            lang === "en"
+              ? "⚠️ Weak idea, needs development"
+              : lang === "es"
+                ? "⚠️ Idea débil, necesita mejoras"
+                : "⚠️ Idea debole, da sviluppare meglio";
+        } else if (score <= 6) {
+          feedback =
+            lang === "en"
+              ? "👍 Good idea with potential"
+              : lang === "es"
+                ? "👍 Buena idea con potencial"
+                : "👍 Buona idea con potenziale";
+        } else if (score <= 8) {
+          feedback =
+            lang === "en"
+              ? "🚀 Very strong idea"
+              : lang === "es"
+                ? "🚀 Idea muy fuerte"
+                : "🚀 Idea molto forte";
+        } else {
+          feedback =
+            lang === "en"
+              ? "🔥 Excellent idea, startup level"
+              : lang === "es"
+                ? "🔥 Excelente idea, nivel startup"
+                : "🔥 Idea eccellente, livello startup";
+        }
+
+        const el = document.getElementById("ai-result-" + id);
+        if (el) el.innerText = feedback;
+      }
+
+      const auth = firebase.auth();
+
+      let currentUser = null;
+
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          currentUser = user;
+          console.log("Login:", user.uid);
+        } else {
+          auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        }
+      });
+
+      function requireUser() {
+        if (!currentUser) {
+          alert("Devi effettuare il login");
+          return false;
+        }
+        return true;
       }
     </script>
   </body>
