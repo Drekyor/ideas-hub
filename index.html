@@ -473,7 +473,7 @@
         document.getElementById("title").value = "";
         document.getElementById("description").value = "";
       }
-      
+
       const texts = {
         it: {
           title: "💡 Dall’idea alla realtà",
@@ -719,7 +719,8 @@
           currentUser = user;
           console.log("Login:", user.uid);
         } else {
-          auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+          const provider = new firebase.auth.GoogleAuthProvider();
+          auth.signInWithRedirect(provider);
         }
       });
 
