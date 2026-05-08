@@ -420,6 +420,7 @@
       let lastPostTime = 0;
 
       function addIdea() {
+        if (!requireUser()) return;
         const now = Date.now();
 
         if (now - lastPostTime < 10000) {
@@ -734,6 +735,11 @@
         if (user) {
           currentUser = user;
           console.log("Login:", user.uid);
+
+          if (window.pendingAction) {
+            window.pendingAction();
+            window.pendingAction = null;
+          }
         }
       });
 
@@ -743,11 +749,17 @@
         auth.signInWithRedirect(provider);
       }
 
-      function requireUser() {
-        if (!currentUser) {
+      function requireUser(callback) {
+        const user = firebase.auth().currentUser;
+
+        if (!user) {
           login();
+
+          // salva azione da fare dopo login
+          window.pendingAction = callback;
           return false;
         }
+
         return true;
       }
     </script>
