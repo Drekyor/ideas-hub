@@ -420,7 +420,10 @@
       let lastPostTime = 0;
 
       function addIdea() {
-        if (!requireUser(addIdea)) return;
+        console.log("🔥 addIdea entrata");
+        
+        if (!requireUser()) return;
+        
         const now = Date.now();
 
         if (now - lastPostTime < 10000) {
@@ -748,13 +751,21 @@
       // login manuale solo quando serve
       function login() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithRedirect(provider);
+
+        auth
+          .signInWithPopup(provider)
+          .then((result) => {
+            currentUser = result.user;
+            console.log("Login OK:", currentUser.uid);
+          })
+          .catch((error) => {
+            console.error("Login error:", error);
+          });
       }
 
-      function requireUser(action) {
+      function requireUser() {
         if (currentUser) return true;
 
-        window.pendingAction = action;
         login();
         return false;
       }
