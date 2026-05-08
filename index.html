@@ -319,6 +319,8 @@
       }
 
       function saveEmail() {
+        if (!requireUser()) return;
+
         const email = document
           .getElementById("email")
           .value.trim()
@@ -340,18 +342,19 @@
         }
 
         db.collection("emails")
-          .doc(email)
+          .doc(currentUser.uid) // 🔥 FIX PRINCIPALE
           .get()
           .then((doc) => {
             if (doc.exists) {
-              alert("⚠️ Questa email è già registrata!");
+              alert("⚠️ Email già registrata!");
               return;
             }
 
             db.collection("emails")
-              .doc(email)
+              .doc(currentUser.uid)
               .set({
                 email: email,
+                userId: currentUser.uid,
                 date: new Date().toLocaleString("it-IT"),
               })
               .then(() => {
