@@ -420,9 +420,8 @@
       let lastPostTime = 0;
 
       function addIdea() {
-        console.log("currentUser:", currentUser);
 
-        if (!requireUser(addIdea)) return;
+        if (!requireUser()) return;
         const now = Date.now();
 
         if (now - lastPostTime < 10000) {
@@ -753,16 +752,10 @@
         auth.signInWithRedirect(provider);
       }
 
-      function requireUser(callback) {
-        if (currentUser) {
-          return true;
-        }
+      function requireUser() {
+        if (currentUser) return true;
 
         login();
-
-        // salva azione da rifare dopo login
-        window.pendingAction = callback;
-
         return false;
       }
     </script>
