@@ -251,14 +251,6 @@
         </button>
       </div>
 
-      <div class="form-box">
-        <h3>📩 Rimani aggiornato</h3>
-
-        <input type="email" id="email" placeholder="Inserisci la tua email" />
-
-        <button onclick="saveEmail()">💾 Salva email</button>
-      </div>
-
       <div id="ideasList"></div>
     </div>
 
@@ -281,23 +273,6 @@
 
       let ideas = [];
 
-      function isValidEmail(email) {
-        const clean = email.toLowerCase().trim();
-
-        if (clean.length > 100) return false;
-
-        // email base
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!regex.test(clean)) return false;
-
-        // evita email palesemente fake tipo a@a.a
-        const parts = clean.split("@");
-        if (parts[0].length < 2) return false;
-        if (parts[1].length < 4) return false;
-
-        return true;
-      }
-
       function isValidText(text) {
         const clean = text.toLowerCase().trim();
 
@@ -316,52 +291,6 @@
         if (/^(.)\1+$/.test(clean)) return false;
 
         return true;
-      }
-
-      function saveEmail() {
-        if (!requireUser()) return;
-
-        const email = document
-          .getElementById("email")
-          .value.trim()
-          .toLowerCase();
-
-        if (!email) {
-          alert("Inserisci un'email");
-          return;
-        }
-
-        if (!isValidEmail(email)) {
-          alert("Email non valida");
-          return;
-        }
-
-        if (email.length > 100) {
-          alert("Email troppo lunga");
-          return;
-        }
-
-        db.collection("emails")
-          .doc(currentUser.uid) // 🔥 FIX PRINCIPALE
-          .get()
-          .then((doc) => {
-            if (doc.exists) {
-              alert("⚠️ Email già registrata!");
-              return;
-            }
-
-            db.collection("emails")
-              .doc(currentUser.uid)
-              .set({
-                email: email,
-                userId: currentUser.uid,
-                date: new Date().toLocaleString("it-IT"),
-              })
-              .then(() => {
-                document.getElementById("email").value = "";
-                alert("✅ Email salvata!");
-              });
-          });
       }
 
       db.collection("ideas").onSnapshot((snapshot) => {
