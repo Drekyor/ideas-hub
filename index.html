@@ -566,8 +566,9 @@
         if (!requireUser()) return;
 
         const text = prompt("Scrivi un commento:");
-
         if (!text || text.trim().length < 2) return;
+
+        const showName = confirm("Vuoi rendere pubblico il tuo nome?");
 
         db.collection("ideas")
           .doc(id)
@@ -575,7 +576,9 @@
           .add({
             text: text,
             userId: currentUser.uid,
-            userName: currentUser.displayName,
+            userName: showName
+              ? currentUser.displayName.split(" ")[0]
+              : "👤 Utente anonimo",
             date: new Date().toLocaleString("it-IT"),
           });
       }
