@@ -395,38 +395,42 @@
           box.className = "idea animate-card";
 
           box.innerHTML = `
-                  <h3>${idea.title}</h3>
-                  <small class="badge">${idea.category}</small>
-                  <p id="desc-${idea.id}" class="idea-description">
-                      ${idea.description}
-                  </p>
+            <h3>${idea.title}</h3>
 
-                  <small onclick="toggleDescription('${idea.id}', this)"
-                  style="cursor:pointer; color:#818cf8;">
-                      Continua a leggere
-                  </small>
+            <small class="badge">${idea.category}</small>
 
-                  <small>📌 ${idea.category}</small>
-                  <div style="display:flex; gap:8px; margin-top:10px;">
-                      <button onclick="likeIdea('${idea.id}')">
-                        👍 ${idea.likes || 0}
-                      </button>
+            <p id="desc-${idea.id}" class="idea-description">
+              ${idea.description}
+            </p>
 
-                      <button onclick="dislikeIdea('${idea.id}')">
-                        👎 ${idea.dislikes || 0}
-                      </button>
+            <small onclick="toggleDescription('${idea.id}', this)"
+            style="cursor:pointer; color:#818cf8;">
+              Continua a leggere
+            </small>
 
-                      <button onclick="commentIdea('${idea.id}')">💬</button>
-                  </div>
+            <small>📌 ${idea.category}</small>
 
-                  <button class="analyze-btn" onclick="analyzeIdea('${idea.id}', \`${idea.title} ${idea.description}\`)">
-                      🧠 Analizza idea
-                  </button>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button onclick="likeIdea('${idea.id}')">
+                👍 ${idea.likes || 0}
+              </button>
 
-                  <p id="ai-result-${idea.id}" style="color:#a5b4fc; margin-top:6px;"></p>
+              <button onclick="dislikeIdea('${idea.id}')">
+                👎 ${idea.dislikes || 0}
+              </button>
 
-                  <div id="comments-${idea.id}" class="comments-box"></div>
-                  `;
+              <button onclick="commentIdea('${idea.id}')">💬</button>
+            </div>
+
+            <button class="analyze-btn"
+              onclick="analyzeIdea('${idea.id}', \`${idea.title} ${idea.description}\`)">
+              🧠 Analizza idea
+            </button>
+
+            <p id="ai-result-${idea.id}" style="color:#a5b4fc; margin-top:6px;"></p>
+
+            <div id="comments-${idea.id}" class="comments-box"></div>
+          `;
 
           ideasList.appendChild(box);
           loadComments(idea.id);
@@ -665,7 +669,7 @@
             userName: showName
               ? currentUser.displayName.split(" ")[0]
               : "👤 Utente anonimo",
-            date: new Date().toLocaleString("it-IT"),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           });
       }
 
@@ -676,7 +680,6 @@
           .orderBy("createdAt", "desc")
           .onSnapshot((snapshot) => {
             const container = document.getElementById("comments-" + id);
-
             if (!container) return;
 
             container.innerHTML = "";
@@ -685,27 +688,26 @@
               const comment = doc.data();
 
               container.innerHTML += `
-              <div style="
-                background: rgba(255,255,255,0.04);
-                padding:8px;
-                border-radius:8px;
-                margin-top:6px;
-                font-size:13px;
-              ">
-                💬 ${comment.text}
-                <br>
-                <small>${comment.userName || "Anonimo"}</small>
+                <div style="
+                  background: rgba(255,255,255,0.04);
+                  padding:8px;
+                  border-radius:8px;
+                  margin-top:6px;
+                  font-size:13px;
+                ">
+                  💬 ${comment.text}
+                  <br>
+                  <small>${comment.userName || "Anonimo"}</small>
 
-                ${
-                  currentUser && comment.userId === currentUser.uid
-                    ? `<button 
-                        onclick="deleteComment(${JSON.stringify(id)}, ${JSON.stringify(doc.id)})"
-                        class="delete-btn">
-                        🗑 Elimina
-                      </button>`
-                    : ""
-                }
-              </div>
+                  ${
+                    currentUser && comment.userId === currentUser.uid
+                      ? `<button onclick="deleteComment('${id}', '${doc.id}')"
+                          class="delete-btn">
+                          🗑 Elimina
+                        </button>`
+                      : ""
+                  }
+                </div>
               `;
             });
           });
