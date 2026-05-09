@@ -160,9 +160,10 @@
       }
 
       #ideasList {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 16px;
+        align-items: start;
       }
       .idea-description {
         display: -webkit-box;
@@ -182,6 +183,9 @@
       .idea {
         position: relative;
         overflow: hidden;
+
+        width: 100%;
+        max-width: 100%;
       }
 
       .idea::before {
@@ -234,6 +238,19 @@
       #toast.show {
         opacity: 1;
         transform: translateY(0);
+      }
+
+      .comments-box {
+        margin-top: 10px;
+        max-width: 100%;
+      }
+
+      .comments-box div {
+        background: rgba(255, 255, 255, 0.04);
+        padding: 8px;
+        border-radius: 8px;
+        margin-top: 6px;
+        font-size: 13px;
       }
     </style>
   </head>
@@ -390,7 +407,7 @@
 
                   <p id="ai-result-${idea.id}" style="color:#a5b4fc; margin-top:6px;"></p>
 
-                  <div id="comments-${idea.id}" style="margin-top:10px;"></div>
+                  <div id="comments-${idea.id}" class="comments-box"></div>
                   `;
 
           ideasList.appendChild(box);
