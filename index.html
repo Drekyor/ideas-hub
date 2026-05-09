@@ -495,7 +495,7 @@
           likes: 0,
           dislikes: 0,
           date: new Date().toLocaleString("it-IT"),
-          createdAt: new Date().toISOString(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
 
         showToast("🚀 Idea pubblicata con successo!");
@@ -673,7 +673,7 @@
         db.collection("ideas")
           .doc(id)
           .collection("comments")
-          .orderBy("date", "desc")
+          .orderBy("createdAt", "desc")
           .onSnapshot((snapshot) => {
             const container = document.getElementById("comments-" + id);
 
@@ -699,7 +699,7 @@
                 ${
                   currentUser && comment.userId === currentUser.uid
                     ? `<button 
-                        onclick="deleteComment('${id}', '${doc.id}')"
+                        onclick="deleteComment(${JSON.stringify(id)}, ${JSON.stringify(doc.id)})"
                         class="delete-btn">
                         🗑 Elimina
                       </button>`
@@ -858,9 +858,14 @@
           .doc(ideaId)
           .collection("comments")
           .doc(commentId)
-          .delete();
-
-        showToast("🗑 Commento eliminato");
+          .delete()
+          .then(() => {
+            showToast("🗑 Commento eliminato");
+          })
+          .catch((err) => {
+            console.error(err);
+            showToast("❌ Errore eliminazione");
+          });
       }
     </script>
   </body>
