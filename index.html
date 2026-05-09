@@ -84,6 +84,14 @@
         background: #4f46e5;
       }
 
+      .analyze-btn {
+        background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+      }
+
+      .analyze-btn:hover {
+        background: #059669;
+      }
+
       .idea {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -317,32 +325,35 @@
           box.className = "idea animate-card";
 
           box.innerHTML = `
-            <h3>${idea.title}</h3>
-            <small class="badge">${idea.category}</small>
-            <p id="desc-${idea.id}" class="idea-description">
-                ${idea.description}
-            </p>
+                  <h3>${idea.title}</h3>
+                  <small class="badge">${idea.category}</small>
+                  <p id="desc-${idea.id}" class="idea-description">
+                      ${idea.description}
+                  </p>
 
-            <small onclick="toggleDescription('${idea.id}', this)" 
-            style="cursor:pointer; color:#818cf8;">
-                Continua a leggere
-            </small>
+                  <small onclick="toggleDescription('${idea.id}', this)"
+                  style="cursor:pointer; color:#818cf8;">
+                      Continua a leggere
+                  </small>
 
-            <small>📌 ${idea.category}</small>
-            <div style="display:flex; gap:8px; margin-top:10px;">
-                <button onclick="likeIdea('${idea.id}')">👍</button>
-                <button onclick="dislikeIdea('${idea.id}')">👎</button>
-                <button onclick="commentIdea('${idea.id}')">💬</button>
-            </div>
+                  <small>📌 ${idea.category}</small>
+                  <div style="display:flex; gap:8px; margin-top:10px;">
+                      <button onclick="likeIdea('${idea.id}')">👍</button>
+                      <button onclick="dislikeIdea('${idea.id}')">👎</button>
+                      <button onclick="commentIdea('${idea.id}')">💬</button>
+                  </div>
 
-            <button onclick="analyzeIdea('${idea.id}', \`${idea.title} ${idea.description}\`)">
-                🧠 Analizza idea
-            </button>
+                  <button class="analyze-btn" onclick="analyzeIdea('${idea.id}', \`${idea.title} ${idea.description}\`)">
+                      🧠 Analizza idea
+                  </button>
 
-            <p id="ai-result-${idea.id}" style="color:#a5b4fc; margin-top:6px;"></p>
-            `;
+                  <p id="ai-result-${idea.id}" style="color:#a5b4fc; margin-top:6px;"></p>
+
+                  <div id="comments-${idea.id}" style="margin-top:10px;"></div>
+                  `;
 
           ideasList.appendChild(box);
+          loadComments(idea.id);
         });
       }
 
@@ -350,9 +361,9 @@
 
       function addIdea() {
         console.log("🔥 addIdea entrata");
-        
+
         if (!requireUser()) return;
-        
+
         const now = Date.now();
 
         if (now - lastPostTime < 10000) {
@@ -566,6 +577,38 @@
             userId: currentUser.uid,
             userName: currentUser.displayName,
             date: new Date().toLocaleString("it-IT"),
+          });
+      }
+
+      function loadComments(id) {
+        db.collection("ideas")
+          .doc(id)
+          .collection("comments")
+          .orderBy("date", "desc")
+          .onSnapshot((snapshot) => {
+            const container = document.getElementById("comments-" + id);
+
+            if (!container) return;
+
+            container.innerHTML = "";
+
+            snapshot.forEach((doc) => {
+              const comment = doc.data();
+
+              container.innerHTML += `
+          <div style="
+            background: rgba(255,255,255,0.04);
+            padding:8px;
+            border-radius:8px;
+            margin-top:6px;
+            font-size:13px;
+          ">
+            💬 ${comment.text}
+            <br>
+            <small>${comment.userName || "Anonimo"}</small>
+          </div>
+        `;
+            });
           });
       }
 
