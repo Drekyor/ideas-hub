@@ -160,8 +160,8 @@
       }
 
       #ideasList {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 16px;
       }
       .idea-description {
@@ -259,6 +259,11 @@
         persone.
       </p>
 
+      <select id="sortSelect" onchange="renderIdeas()">
+        <option value="likes">🔥 Più votate</option>
+        <option value="date">🕒 Più recenti</option>
+      </select>
+
       <div class="form-box">
         <input
           type="text"
@@ -342,7 +347,13 @@
         const ideasList = document.getElementById("ideasList");
         ideasList.innerHTML = "";
 
-        ideas.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        const sortBy = document.getElementById("sortSelect")?.value || "likes";
+
+        if (sortBy === "likes") {
+          ideas.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        } else {
+          ideas.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
 
         ideas.forEach((idea, index) => {
           const box = document.createElement("div");
@@ -362,8 +373,14 @@
 
                   <small>📌 ${idea.category}</small>
                   <div style="display:flex; gap:8px; margin-top:10px;">
-                      <button onclick="likeIdea('${idea.id}')">👍</button>
-                      <button onclick="dislikeIdea('${idea.id}')">👎</button>
+                      <button onclick="likeIdea('${idea.id}')">
+                        👍 ${idea.likes || 0}
+                      </button>
+
+                      <button onclick="dislikeIdea('${idea.id}')">
+                        👎 ${idea.dislikes || 0}
+                      </button>
+
                       <button onclick="commentIdea('${idea.id}')">💬</button>
                   </div>
 
@@ -443,6 +460,7 @@
           likes: 0,
           dislikes: 0,
           date: new Date().toLocaleString("it-IT"),
+          createdAt: new Date().toISOString(),
         });
 
         showToast("🚀 Idea pubblicata con successo!");
@@ -632,18 +650,28 @@
               const comment = doc.data();
 
               container.innerHTML += `
-          <div style="
-            background: rgba(255,255,255,0.04);
-            padding:8px;
-            border-radius:8px;
-            margin-top:6px;
-            font-size:13px;
-          ">
-            💬 ${comment.text}
-            <br>
-            <small>${comment.userName || "Anonimo"}</small>
-          </div>
-        `;
+              <div style="
+                background: rgba(255,255,255,0.04);
+                padding:8px;
+                border-radius:8px;
+                margin-top:6px;
+                font-size:13px;
+              ">
+                💬 ${comment.text}
+                <br>
+                <small>${comment.userName || "Anonimo"}</small>
+
+                ${
+                  currentUser && comment.userId === currentUser.uid
+                    ? `<button 
+                        onclick="deleteComment('${id}', '${doc.id}')"
+                        style="margin-top:6px; background:#ef4444;">
+                        🗑 Elimina
+                      </button>`
+                    : ""
+                }
+              </div>
+              `;
             });
           });
       }
@@ -788,6 +816,16 @@
         showToast("🔐 Effettua il login con Google");
         login();
         return false;
+      }
+
+      function deleteComment(ideaId, commentId) {
+        db.collection("ideas")
+          .doc(ideaId)
+          .collection("comments")
+          .doc(commentId)
+          .delete();
+
+        showToast("🗑 Commento eliminato");
       }
     </script>
   </body>
