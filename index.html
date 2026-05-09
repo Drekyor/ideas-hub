@@ -212,10 +212,34 @@
         font-size: 12px;
         font-weight: bold;
       }
+
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: rgba(15, 23, 42, 0.95);
+        color: white;
+        padding: 14px 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+        font-size: 14px;
+        z-index: 9999;
+
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+
+      #toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
     </style>
   </head>
 
   <body>
+    <div id="toast"></div>
     <div style="text-align: center; margin-bottom: 20px">
       <select id="lang" onchange="changeLang()">
         <option value="it">🇮🇹 Italiano</option>
@@ -367,7 +391,9 @@
         const now = Date.now();
 
         if (now - lastPostTime < 10000) {
-          alert("⏳ Aspetta qualche secondo prima di pubblicare un'altra idea");
+          showToast(
+            "⏳ Aspetta qualche secondo prima di pubblicare un'altra idea",
+          );
           return;
         }
 
@@ -378,32 +404,34 @@
         const category = document.getElementById("category").value;
 
         if (!title || !description || !category) {
-          alert("Compila tutti i campi");
+          showToast("⚠️ Compila tutti i campi");
           return;
         }
 
         if (category === "other") {
-          alert("⚠️ Al momento sono accettate solo App, Software e Pagine Web");
+          showToast(
+            "⚠️ Al momento sono accettate solo App, Software e Pagine Web",
+          );
           return;
         }
 
         if (title.length < 3 || title.length > 50) {
-          alert("Titolo deve avere tra 3 e 50 caratteri");
+          showToast("Titolo deve avere tra 3 e 50 caratteri");
           return;
         }
 
         if (description.length < 10 || description.length > 500) {
-          alert("Descrizione deve avere tra 10 e 500 caratteri");
+          showToast("Descrizione deve avere tra 10 e 500 caratteri");
           return;
         }
 
         if (!isValidText(title)) {
-          alert("Titolo non valido o senza senso");
+          showToast("Titolo non valido o senza senso");
           return;
         }
 
         if (!isValidText(description)) {
-          alert("Descrizione non valida o senza senso");
+          showToast("Descrizione non valida o senza senso");
           return;
         }
 
@@ -416,6 +444,8 @@
           dislikes: 0,
           date: new Date().toLocaleString("it-IT"),
         });
+
+        showToast("🚀 Idea pubblicata con successo!");
 
         document.getElementById("title").value = "";
         document.getElementById("description").value = "";
@@ -503,7 +533,7 @@
           const prev = doc.exists ? doc.data().type : null;
 
           if (prev === "like") {
-            alert("⚠️ Hai già messo like!");
+            showToast("⚠️ Hai già messo like!");
             return;
           }
 
@@ -540,7 +570,7 @@
           const prev = doc.exists ? doc.data().type : null;
 
           if (prev === "dislike") {
-            alert("⚠️ Hai già messo dislike!");
+            showToast("⚠️ Hai già messo dislike!");
             return;
           }
 
@@ -566,7 +596,10 @@
         if (!requireUser()) return;
 
         const text = prompt("Scrivi un commento:");
-        if (!text || text.trim().length < 2) return;
+        if (!text || text.trim().length < 2) {
+          showToast("⚠️ Commento troppo corto");
+          return;
+        }
 
         const showName = confirm("Vuoi rendere pubblico il tuo nome?");
 
@@ -692,6 +725,17 @@
         if (el) el.innerText = feedback;
       }
 
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+
+        toast.innerText = message;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
+      }
+
       const auth = firebase.auth();
       let currentUser = null;
 
@@ -741,6 +785,7 @@
       function requireUser() {
         if (currentUser) return true;
 
+        showToast("🔐 Effettua il login con Google");
         login();
         return false;
       }
